@@ -1,19 +1,41 @@
 #### Preamble ####
-# Purpose: Simulates... [...UPDATE THIS...]
-# Author: Rohan Alexander [...UPDATE THIS...]
-# Date: 11 February 2023 [...UPDATE THIS...]
-# Contact: rohan.alexander@utoronto.ca [...UPDATE THIS...]
+# Purpose: Simulates the lead concentration (in ppm) of water in 1000 houses in the Toronto area using a normal distribution with a mean of 0.05 ppm and a standard deviation of 0.02. This simulation will also delete any entries with a lead ppm below 0 as well as incorporating a postal code for each house.
+# Author: Abbass Sleiman
+# Date: 18 January 2024
+# Contact: abbass.sleiman@mail.utoronto.ca
 # License: MIT
-# Pre-requisites: [...UPDATE THIS...]
-# Any other information needed? [...UPDATE THIS...]
+# Pre-requisites: None required
 
 
 #### Workspace setup ####
 library(tidyverse)
-# [...UPDATE THIS...]
+library(dplyr)
+library(tibble)
 
 #### Simulate data ####
-# [...ADD CODE HERE...]
+set.seed(9)
 
+#Simulate 1000 random values from a normal distribution
+simulated_values <- rnorm(1000, mean = 0.005, sd=0.002)
 
+#Eliminate values below 0 (impossible in reality for a lead concentration to be below 0)
+simulated_values <- pmax(simulated_values, 0)
+
+#Create a table that displays the values of each house and includes a postal code for each.
+simulated_data <- 
+  tibble(
+    "House number" = c(1:1000),
+    "Postal code" = sample(
+      x = c("M4E", "M4K", "M5S", "M1L", "M6H"),
+      size = 1000,
+      replace = TRUE
+    ),
+    "Lead concentration (ppm)" = sample(
+      x = simulated_values,
+      size = 1000,
+      replace = FALSE
+  )
+)
+
+simulated_data
 
