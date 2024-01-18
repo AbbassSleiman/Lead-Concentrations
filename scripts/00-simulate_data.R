@@ -39,3 +39,22 @@ simulated_data <-
 
 simulated_data
 
+#Tests for the simulated data:
+#test1: Tests that the postal codes are exclusively one of the 5 specified in the tibble
+test1 <- simulated_data$"Postal code" %in% c("M4E", "M4K", "M5S", "M1L", "M6H")
+
+#Returns a value of TRUE if all of values passed test1
+all(test1) 
+
+#test2: Tests that the lead concentration is at least 0
+test2 <- simulated_data$"Lead concentration (ppm)" >= 0
+
+#Returns a value of TRUE if all of values passed test2
+all(test2)
+
+#test3: Tests that there are 1000 simulated houses
+num_rows <- nrow(simulated_data)
+num_rows == 1000
+
+#test4: Tests whether all entries in the lead concentration column are numeric
+simulated_data$"Lead concentration (ppm)" |> class() == "numeric"
