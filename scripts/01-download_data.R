@@ -19,7 +19,6 @@ raw_lead_data <-
   file =
     "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/8171f7ab-364e-46a7-8a62-08f073ca6d96/resource/4b141457-e2a5-43e9-b5a4-25629419521d/download/Non%20Regulated%20Lead%20Samples.csv",
   show_col_types = FALSE,
-  skip = 1
   
 )
 
