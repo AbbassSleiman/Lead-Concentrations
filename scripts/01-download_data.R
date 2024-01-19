@@ -12,7 +12,6 @@
 library(opendatatoronto)
 library(tidyverse)
 library(janitor)
-# [...UPDATE THIS...]
 
 #### Download data ####
 raw_lead_data <- 
@@ -27,8 +26,6 @@ raw_lead_data <-
 
 
 #### Save data ####
-# [...UPDATE THIS...]
-# change the_raw_data to whatever name you assigned when you downloaded it.
-write_csv(raw_lead_data, "inputs/data/raw_data.csv") 
+write_csv(raw_lead_data, "inputs/data/raw_data.csv")
 
          
