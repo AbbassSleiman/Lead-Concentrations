@@ -1,44 +1,44 @@
 #### Preamble ####
-# Purpose: Cleans the raw plane data recorded by two observers..... [...UPDATE THIS...]
-# Author: Rohan Alexander [...UPDATE THIS...]
-# Date: 6 April 2023 [...UPDATE THIS...]
-# Contact: rohan.alexander@utoronto.ca [...UPDATE THIS...]
+# Purpose: Cleans the raw lead concentration data by renaming the headers and
+# ensuring all values are physically plausible. Moreover, any data that is
+# missing from any one of the columns of interest (in this particular data set,
+# such rows will feature an "NA" as a value for whatever data is missing) will 
+# be removed entirely.
+# Author: Abbass Sleiman
+# Date: 18 January 2024
+# Contact: abbass.sleiman@mail.utoronto.ca
 # License: MIT
-# Pre-requisites: [...UPDATE THIS...]
-# Any other information needed? [...UPDATE THIS...]
+# Pre-requisites: None required
 
 #### Workspace setup ####
 library(tidyverse)
+library(janitor)
 
 #### Clean data ####
-raw_data <- read_csv("inputs/data/plane_data.csv")
+raw_lead_data <- read_csv("inputs/data/raw_data.csv")
 
 cleaned_data <-
-  raw_data |>
+  raw_lead_data |>
   janitor::clean_names() |>
-  select(wing_width_mm, wing_length_mm, flying_time_sec_first_timer) |>
-  filter(wing_width_mm != "caw") |>
-  mutate(
-    flying_time_sec_first_timer = if_else(flying_time_sec_first_timer == "1,35",
-                                   "1.35",
-                                   flying_time_sec_first_timer)
+  rename(
+    postal_code = partial_postal_code,
+    lead_concentration_ppm = lead_amount_ppm
   ) |>
-  mutate(wing_width_mm = if_else(wing_width_mm == "490",
-                                 "49",
-                                 wing_width_mm)) |>
-  mutate(wing_width_mm = if_else(wing_width_mm == "6",
-                                 "60",
-                                 wing_width_mm)) |>
-  mutate(
-    wing_width_mm = as.numeric(wing_width_mm),
-    wing_length_mm = as.numeric(wing_length_mm),
-    flying_time_sec_first_timer = as.numeric(flying_time_sec_first_timer)
+  select(
+    postal_code,
+    lead_concentration_ppm
   ) |>
-  rename(flying_time = flying_time_sec_first_timer,
-         width = wing_width_mm,
-         length = wing_length_mm
-         ) |> 
-  tidyr::drop_na()
+  na.omit()
+
+cleaned_data <- cleaned_data |>
+  mutate(lead_concentration_ppm = str_remove(lead_concentration_ppm, "<")) |>
+  mutate(lead_concentration_ppm = as.numeric(lead_concentration_ppm))
+
+average_lead_by_postal_code <- cleaned_data |> 
+  group_by(postal_code) |> 
+  summarise(average_lead_by_postal_code = mean(lead_concentration_ppm))
 
 #### Save data ####
-write_csv(cleaned_data, "outputs/data/analysis_data.csv")
+write_csv(cleaned_data, "outputs/data/cleaned_lead_data.csv")
+write_csv(average_lead_by_postal_code, "outputs/data/average_lead_by_postal_code.csv")
+
