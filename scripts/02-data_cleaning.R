@@ -34,11 +34,7 @@ cleaned_data <- cleaned_data |>
   mutate(lead_concentration_ppm = str_remove(lead_concentration_ppm, "<")) |>
   mutate(lead_concentration_ppm = as.numeric(lead_concentration_ppm))
 
-average_lead_by_postal_code <- cleaned_data |> 
-  group_by(postal_code) |> 
-  summarise(average_lead_by_postal_code = mean(lead_concentration_ppm))
-
 #### Save data ####
 write_csv(cleaned_data, "outputs/data/cleaned_lead_data.csv")
-write_csv(average_lead_by_postal_code, "outputs/data/average_lead_by_postal_code.csv")
+
 
