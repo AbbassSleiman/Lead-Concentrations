@@ -27,6 +27,7 @@ cleaned_data <-
   mutate(sample_date = as.Date(sample_date)) |>
   filter(year(sample_date) != 2014) |>
   select(
+    sample_date,
     postal_code,
     lead_concentration_ppb
   ) |>
