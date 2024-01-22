@@ -21,41 +21,36 @@ cleaned_data <- read_csv("outputs/data/cleaned_lead_data.csv")
 # Tests for the simulated data:
 # test1: Tests that the postal codes are exclusively one of the 96 specified 
 # below.
-test1 <- cleaned_data$postal_code %in% c("M4E", "M4K", "M1L", "M3B", "M6H", 
-                                         "M4J", "M4M", "M4G", "M4C", "M6E", 
-                                         "M6P", "M6N", "M4L", "M4R", "M2M", 
-                                         "M9B", "M6J", "M8Z", "M5N", "M5R", 
-                                         "M6C", "M1G", "M6M", "M6R", "M4P", 
-                                         "M5M", "M1R", "M2J", "M6S", "M9A", 
-                                         "M1N", "M3H", "M2N", "M1E", "M6A", 
-                                         "M5T", "M4S", "M6G", "M4N", "M1M", 
-                                         "M3M", "M4B", "M6K", "M5P", "M3J", 
-                                         "M1P", "M8V", "M8W", "M1H", "M9C", 
-                                         "M9R", "M4V", "M4T", "M6B", "M4W", 
-                                         "M5S", "M9P", "M5A", "M2P", "M1S", 
-                                         "M8Y", "M3A", "M2H", "M8X", "M1B", 
-                                         "M2R", "M9W", "M3K", "M1V", "M4Y", 
-                                         "M1T", "M5V", "M2L", "M2K", "M1K", 
-                                         "M9M", "M9N", "M4X", "M1J", "M1C", 
-                                         "M9V", "M3C", "M5H", "M5B", "M5G", 
-                                         "M6L", "M3L", "M4A", "M1X", "M3N", 
-                                         "M5J", "M5K", "M1W", "M5C", "M9L",
-                                         "M5E"
-                                         
-)
+test1 <- cleaned_data$postal_code %in% c("M1N", "M4V", "M4J", "M6H", "M6R", "M6J", 
+                                         "M6P", "M6S", "M9R", "M2R", "M4C", "M6C", 
+                                         "M4R", "M8Y", "M6E", "M1R", "M5M", "M4K", 
+                                         "M6G", "M4T", "M4E", "M4S", "M8W", "M9C", 
+                                         "M4M", "M5P", "M3N", "M4N", "M4P", "M4L", 
+                                         "M5A", "M8V", "M4G", "M2N", "M1H", "M5R", 
+                                         "M5N", "M4W", "M9A", "M3H", "M6N", "M3L", 
+                                         "M5S", "M6K", "M9P", "M6M", "M4B", "M9N", 
+                                         "M1P", "M1E", "M4A", "M5K", "M9B", "M8Z", 
+                                         "M2M", "M5G", "M5V", "M2K", "M4X", "M1J", 
+                                         "M1L", "M8X", "M2H", "M6B", "M1B", "M9V", 
+                                         "M2L", "M6A", "M1M", "M1G", "M3J", "M4Y", 
+                                         "M9M", "M3A", "M9W", "M2P", "M6L", "M1K", 
+                                         "M1S", "M3C", "M3B", "M1W", "M5T", "M1T", 
+                                         "M1C", "M3M", "M2J", "M5B", "M5J", "M5C", 
+                                         "M1V", "M9L", "M5E", "M1X", "M3K", "M5H"
+                                         )
 
 # Returns a value of TRUE if all of values passed test1
 all(test1) 
 
 # test2: Tests that the lead concentration is at least 0
-test2 <- cleaned_data$lead_concentration_ppm >= 0
+test2 <- cleaned_data$lead_concentration_ppb >= 0
 
 # Returns a value of TRUE if all of values passed test2
 all(test2)
 
-# test3: Tests that there are exactly 12802 houses in the data
+# test3: Tests that there are exactly 9302 houses in the data
 num_rows <- nrow(cleaned_data)
-num_rows == 12802
+num_rows == 9302
 
 # test4: Tests whether all entries in the lead concentration column are numeric
-cleaned_data$lead_concentration_ppm |> class() == "numeric"
+cleaned_data$lead_concentration_ppb |> class() == "numeric"
