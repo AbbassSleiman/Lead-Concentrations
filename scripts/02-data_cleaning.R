@@ -24,6 +24,8 @@ cleaned_data <-
     postal_code = partial_postal_code,
     lead_concentration_ppb = lead_amount_ppm
   ) |>
+  mutate(sample_date = as.Date(sample_date)) |>
+  filter(year(sample_date) != 2014) |>
   select(
     postal_code,
     lead_concentration_ppb
