@@ -1,14 +1,14 @@
 ---
-title: "My title"
+title: "Testing the Waters: A Dive into Elevated Lead Levels in Toronto Homes"
 subtitle: "My subtitle if needed"
 author: 
-  - First author
-  - Another author
-thanks: "Code and data are available at: LINK."
+  - Abbass Sleiman
+thanks: "Code and data used in this analysis can be found at: https://github.com/AbbassSleiman/Lead-Concentrations."
 date: today
 date-format: long
 abstract: "First sentence. Second sentence. Third sentence. Fourth sentence."
 format: pdf
+toc: true
 number-sections: true
 bibliography: references.bib
 ---
@@ -18,122 +18,107 @@ bibliography: references.bib
 #| warning: false
 #| message: false
 
+#### Workspace setup ####
+
+# Package loading
 library(tidyverse)
-library(palmerpenguins)
+library(here)
+library(tinytex) #this is where the used ones end so far.
+library(dplyr)
+library(tibble)
+library(opendatatoronto)
+library(janitor)
+library(ggplot2)
+library(knitr)
+
+# Read data
+raw_lead_data <- read_csv(here("inputs/data/raw_data.csv"))
+cleaned_data <- read_csv(here("outputs/data/cleaned_lead_data.csv"))
+
+# Create a data set based off the cleaned data that returns the average
+
+average_lead_by_postal_code <- cleaned_data |> 
+  group_by(postal_code) |> 
+  summarise(average_lead_by_postal_code = mean(lead_concentration_ppb))
+
+
 ```
 
 
 # Introduction
 
-You can and should cross-reference sections and sub-sections. 
+Lead exposure is a serious concern for many, capable of seriously harming children's health, as well as causing a multitude of effects including damage to the brain, slowed growth, decreased IQ, and various others [@citeCDChealth]. Of the various sources of lead exposure, lead in drinking water is a relevant concern for many of us given the average person's daily reliance on tap water. Thus, given the dangers of lead exposure, in conjunction with the fact that lead cannot be seen, smelled, nor tasted, means that getting one's water tested and having knowledge of its lead concentration is incredibly useful, and possibly impactful [@citeCDCwater].
+
+Water produced by Toronto's drinking water treatment plans is not contaminated by lead. Instead, lead either contaminates the water through water service pipes, solder, or leaded-brass fixtures in objects like valves or faucets, depending on when the particular house was built. In 2011, the Toronto City Council approved a lead in water mitigation strategy that aimed to reduce lead in drinking water. In 2014, the city had begun to add phosphate to the drinking water treatment process which forms a protective coating in all pipes and plumbing fixtures, effectively aiding in the reduction of lead contamination in water [@citeCityToronto].
+
+Lead concentration in water is typically measured in parts per billion (ppb), which is a unit of measurement describing small concentrations in water whereby 1 ppb is equivalent to 1 microgram per litre ($1 \space \mu g/L$) [@citeppb]. In May of 2014, a study had showed that 13% of Torontonian homes exceeded Health Canada's standards for lead exposure of 10 ppb after analyzing 15,000 water samples provided to the city by homeowners between 2008-2014 through the Residential Lead Testing Program [@citeCBC]. This paper utilizes data from the Residential Lead Testing Program that includes 9,302 water samples provided by households between 2015-2024 and seeks to evaluate whether the implementation of phosphate into the drinking water treatment in 2014 has made any impact on the portion of Torontonian homes with lead exposure exceeding Health Canada's standards of 10 ppb. This paper finds that...
 
 The remainder of this paper is structured as follows. @sec-data....
 
 
-
 # Data {#sec-data}
 
-Some of our data is of penguins (@fig-bills), from @palmerpenguins.
+The data used in this paper is derived from Open Data Toronto and is read into this paper through the opendatatoronto library [@citeOpenDataToronto]. The particular data set used to analyze the lead concentrations in water samples in Torontonian homes is Non Regulated Lead Sample [@citeLeadData]. All the data analysis was done through R [@citeR] with the aid of the following packages: tidyverse [@citetidyverse], here [@citehere], dplyr [@citedplyr], tibble [@citetibble], janitor [@citejanitor], ggplot2 [@citeggplot2], and knitr [@citeknitr]. (maybe readr?)
 
 ```{r}
-#| label: fig-bills
-#| fig-cap: Bills of penguins
+#| label: tbl-raw-data
+#| tbl-cap: Sample of Raw Lead Data 
 #| echo: false
 
-ggplot(penguins, aes(x = island, fill = species)) +
-  geom_bar(alpha = 0.8) +
-  scale_fill_manual(values = c("darkorange","purple","cyan4"),
-                    guide = "none") +
-  theme_minimal() +
-  facet_wrap(~species, ncol = 1) +
-  coord_flip()
+head(raw_lead_data, 6) |>
+  kable(
+    col.names = c("ID", "Sample Number", "Sample Date", "Partial Postal Code", 
+                  "Lead Concentration (ppm)"),
+    booktabs = TRUE
+    )
 ```
 
-Talk more about it.
-
-And also planes (@fig-planes). (You can change the height and width, but don't worry about doing that until you have finished every other aspect of the paper - Quarto will try to make it look nice and the defaults usually work well once you have enough text.)
+The data used is published by Toronto Water and features data from Toronto's Residential Lead Testing Program, providing information on various houses' lead concentrations based on water samples that the households themselves provide. The data is refreshed daily and the particular data used in this paper is up-to-date as of January 22, 2024. The raw data set features the lead concentration in parts per million (ppm) of 12,810 water samples where 1 ppm is equivalent to 1000 ppb or 1 milligram per litre ($1 \space mg/L$). For each water sample the following is included: the id (unique row identifier for the Open Data database), sample number (laboratory sample id), sample date (the date the sample was collected by the resident), partial postal code (only the first three digits of the resident's postal code for privacy reasons), lead amount (the lead concentration in ppm from the sample), a sample of which can be seen in @tbl-raw-data. 
 
 ```{r}
-#| label: fig-planes
-#| fig-cap: Relationship between wing length and width
+#| label: tbl-cleaned-data
+#| tbl-cap: Sample of Cleaned Lead Data 
 #| echo: false
-#| warning: false
-#| message: false
 
-analysis_data <- read_csv(here::here("outputs/data/analysis_data.csv"))
-
-analysis_data |> 
-  ggplot(aes(x = width, y = length)) +
-  geom_point(alpha = 0.8) +
-  theme_minimal() +
-  labs(x = "Wing width (mm)",
-       y = "Wing length (mm)")
+head(cleaned_data, 6) |>
+  kable(
+    col.names = c("Sample Date", "Partial Postal Code", "Lead Concentration (ppb)"),
+    booktabs = TRUE
+    )
 ```
 
-Talk way more about it. 
+Some of the data points had missing attributes whereby a "NA" was put in place of the true value. Such entries were removed entirely in the data cleaning process to simplify the analysis procedure. Moreover, the raw data set includes samples collected as early as January 1 2014 and as late as January 2 2024. As this paper is concerned with the after-effects of the phosphate addition to the drinking water treatment process in 2014, all entries in 2014 were also eliminated in the cleaning process to ensure that the data analysis is conducted only on water samples taken after the policy was put into effect. Moreover, the cleaned data features only the columns for the date, partial postal code, and lead concentration (in ppb as it is the more commonly used unit of measurement). A sample of the cleaned data can be seen in @tbl-cleaned-data above.
+
+```{r}
+#| label: tbl-sumstats
+#| tbl-cap: Sample Summary Statistics by Postal Code 
+#| echo: false
+
+cleaned_data |>
+  group_by(postal_code) |>
+  summarize(
+    mean_lead_concentration_ppb = mean(lead_concentration_ppb),
+    sd_lead_concentration_ppb = sd(lead_concentration_ppb)
+  ) |>
+  head(6) |>
+  kable(
+    col.names = c("Partial Postal Code", "Mean Lead Concentration (ppb)", "SD of Lead Concentration (ppb)"),
+    booktabs = TRUE
+    )
+```
+
+This particular data set was chosen as it is derived from the exact same source that the original study conducted in 2014 - that deemed that 13% of Torontonian households exceeded the maximum acceptable limit of 10 ppb - used [@citeCBC]. Thus, in an attempt to mitigate potential biases, the paper makes use of data that was collected in the exact same manner but over the time period of interest (2015 and onward).  
 
 
 
-# Model
 
-The goal of our modelling strategy is twofold. Firstly,...
-
-Here we briefly describe the Bayesian analysis model used to investigate... Background details and diagnostics are included in [Appendix -@sec-model-details].
-
-## Model set-up
-
-Define $y_i$ as the number of seconds that the plane remained aloft. Then $\beta_i$ is the wing width and $\gamma_i$ is the wing length, both measured in millimeters.  
-
-\begin{align} 
-y_i|\mu_i, \sigma &\sim \mbox{Normal}(\mu_i, \sigma) \\
-\mu_i &= \alpha + \beta_i + \gamma_i\\
-\alpha &\sim \mbox{Normal}(0, 2.5) \\
-\beta &\sim \mbox{Normal}(0, 2.5) \\
-\gamma &\sim \mbox{Normal}(0, 2.5) \\
-\sigma &\sim \mbox{Exponential}(1)
-\end{align}
-
-We run the model in R [@citeR] using the `rstanarm` package of @rstanarm. We use the default priors from `rstanarm`.
-
-
-### Model justification
-
-We expect a positive relationship between the size of the wings and time spent aloft. In particular...
-
-We can use maths by including latex between dollar signs, for instance $\theta$.
 
 
 # Results
 
-Our results are summarized in @tbl-modelresults.
+Our results are summarized in
 
-```{r}
-#| echo: false
-#| eval: true
-#| warning: false
-#| message: false
 
-library(rstanarm)
-
-first_model <-
-  readRDS(file = here::here("outputs/models/first_model.rds"))
-```
-
-```{r}
-#| echo: false
-#| eval: true
-#| label: tbl-modelresults
-#| tbl-cap: "Explanatory models of flight time based on wing width and wing length"
-#| warning: false
-
-modelsummary::modelsummary(
-  list(
-    "First model" = first_model
-  ),
-  statistic = "mad",
-  fmt = 2
-)
-```
 
 
 
@@ -142,15 +127,12 @@ modelsummary::modelsummary(
 
 ## First discussion point {#sec-first-point}
 
-If my paper were 10 pages, then should be be at least 2.5 pages. The discussion is a chance to show off what you know and what you learnt from all this. 
-
 ## Second discussion point
 
 ## Third discussion point
 
 ## Weaknesses and next steps
 
-Weaknesses and next steps should also be included.
 
 \newpage
 
@@ -161,55 +143,11 @@ Weaknesses and next steps should also be included.
 
 # Additional data details
 
-# Model details {#sec-model-details}
 
-## Posterior predictive check
-
-In @fig-ppcheckandposteriorvsprior-1 we implement a posterior predictive check. This shows...
-
-In @fig-ppcheckandposteriorvsprior-2 we compare the posterior with the prior. This shows... 
-
-```{r}
-#| eval: true
-#| echo: false
-#| message: false
-#| warning: false
-#| label: fig-ppcheckandposteriorvsprior
-#| layout-ncol: 2
-#| fig-cap: "Examining how the model fits, and is affected by, the data"
-#| fig-subcap: ["Posterior prediction check", "Comparing the posterior with the prior"]
-
-pp_check(first_model) +
-  theme_classic() +
-  theme(legend.position = "bottom")
-
-posterior_vs_prior(first_model) +
-  theme_minimal() +
-  scale_color_brewer(palette = "Set1") +
-  theme(legend.position = "bottom") +
-  coord_flip()
-```
 
 ## Diagnostics
 
-@fig-stanareyouokay-1 is a trace plot. It shows... This suggests...
 
-@fig-stanareyouokay-2 is a Rhat plot. It shows... This suggests...
-
-```{r}
-#| echo: false
-#| eval: true
-#| message: false
-#| warning: false
-#| label: fig-stanareyouokay
-#| fig-cap: "Checking the convergence of the MCMC algorithm"
-#| fig-subcap: ["Trace plot", "Rhat plot"]
-#| layout-ncol: 2
-
-plot(first_model, "trace")
-
-plot(first_model, "rhat")
-```
 
 
 
