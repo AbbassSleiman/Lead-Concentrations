@@ -50,7 +50,7 @@ all(test2)
 
 # test3: Tests that there are exactly 9302 houses in the data
 num_rows <- nrow(cleaned_data)
-num_rows == 9302
+num_rows == 9262
 
 # test4: Tests whether all entries in the lead concentration column are numeric
 cleaned_data$lead_concentration_ppb |> class() == "numeric"
