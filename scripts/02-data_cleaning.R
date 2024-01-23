@@ -37,7 +37,8 @@ cleaned_data <- cleaned_data |>
   mutate(lead_concentration_ppb = str_remove(lead_concentration_ppb, "<")) |>
   mutate(lead_concentration_ppb = as.numeric(lead_concentration_ppb)) |>
   mutate(postal_code = str_replace(postal_code, "m2l", "M2L")) |>
-  mutate(lead_concentration_ppb = lead_concentration_ppb * 1000)
+  mutate(lead_concentration_ppb = lead_concentration_ppb * 1000) |>
+  filter(lead_concentration_ppb < 100)
 
 #### Save data ####
 write_csv(cleaned_data, "outputs/data/cleaned_lead_data.csv")
