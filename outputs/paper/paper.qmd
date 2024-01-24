@@ -65,24 +65,11 @@ The remainder of this paper is structured as follows. @sec-data....
 
 The data used in this paper is derived from Open Data Toronto and is read into this paper through the opendatatoronto library [@citeOpenDataToronto]. The particular data set used to analyze the lead concentrations in water samples in Torontonian homes is Non Regulated Lead Sample [@citeLeadData]. All the data analysis was done through R [@citeR] with the aid of the following packages: tidyverse [@citetidyverse], here [@citehere], dplyr [@citedplyr], tibble [@citetibble], janitor [@citejanitor], ggplot2 [@citeggplot2], and knitr [@citeknitr]. (maybe readr?)
 
-The data used is published by Toronto Water and features data from Toronto's Residential Lead Testing Program, providing information on various houses' lead concentrations based on water samples that the households themselves provide. The data is refreshed daily and the particular data used in this paper is up-to-date as of January 22, 2024. The raw data set features the lead concentration in parts per million (ppm) of 12,810 water samples where 1 ppm is equivalent to 1000 ppb or 1 milligram per litre ($1 \space mg/L$). For each water sample the following is included: the id (unique row identifier for the Open Data database), sample number (laboratory sample id), sample date (the date the sample was collected by the resident), partial postal code (only the first three digits of the resident's postal code for privacy reasons), lead amount (the lead concentration in ppm from the sample), a sample of which can be seen in @tbl-raw-data. 
-
-```{r}
-#| label: tbl-raw-data
-#| tbl-cap: Sample of Raw Lead Data 
-#| echo: false
-
-head(raw_lead_data, 6) |>
-  kable(
-    col.names = c("ID", "Sample Number", "Sample Date", "Partial Postal Code", 
-                  "Lead Concentration (ppm)"),
-    booktabs = TRUE
-    )
-```
+The data used is published by Toronto Water and features data from Toronto's Residential Lead Testing Program, providing information on various houses' lead concentrations based on water samples that the households themselves provide. The data is refreshed daily and the particular data used in this paper is up-to-date as of January 22, 2024. The raw data set features the lead concentration in parts per million (ppm) of 12,810 water samples where 1 ppm is equivalent to 1000 ppb or 1 milligram per litre ($1 \space mg/L$). The data set also includes the date that each sample was collected, as well as the partial postal code (only the first three digits of the resident's postal code for privacy reasons).
 
 ## Cleaned Data
 
-Some of the data points had missing attributes whereby a "NA" was put in place of the true value. Such entries were removed entirely in the data cleaning process to simplify the analysis procedure. Moreover, the raw data set includes samples collected as early as January 1 2014 and as late as January 2 2024. As this paper is concerned with the after-effects of the phosphate addition to the drinking water treatment process in 2014, all entries in 2014 were also eliminated in the cleaning process to ensure that the data analysis is conducted only on water samples taken after the policy was put into effect. Furthermore, the cleaned data features only the columns for the date, partial postal code, and lead concentration (in ppb as it is the more commonly used unit of measurement). Some lead concentration entries in the raw data were also deemed to be outliers and were subsequently removed in the data cleaning process. In the context of this paper, a lead concentration outlier is defined to be any value exceeding (and including) 100 ppb, 20 times Health Canada's standard of 5 ppb [@citeMaxLeadCanada], and as such given that in Canada the concentration of lead in water is generally below the maximum [@citeTypicalMaxLead], it is reasonable to assume that values above 100 ppb are clear outliers or simply errors in data collection. A sample of the cleaned data can be seen in @tbl-cleaned-data above as well as a scatter plot of every observation by date of collection in @fig-lead-samples-over-time.
+Some of the data points had missing attributes whereby a "NA" was put in place of the true value. Such entries were removed entirely in the data cleaning process to simplify the analysis procedure. Moreover, the raw data set includes samples collected as early as January 1 2014 and as late as January 2 2024. As this paper is concerned with the after-effects of the phosphate addition to the drinking water treatment process in 2014, all entries in 2014 were also eliminated in the cleaning process to ensure that the data analysis is conducted only on water samples taken after the policy was put into effect. Furthermore, the cleaned data features only the columns for the date, partial postal code, and lead concentration (in ppb as it is the more commonly used unit of measurement). Some lead concentration entries in the raw data were also deemed to be outliers and were subsequently removed in the data cleaning process. In the context of this paper, a lead concentration outlier is defined to be any value exceeding (and including) 100 ppb, 20 times Health Canada's standard of 5 ppb [@citeMaxLeadCanada], and as such given that in Canada the concentration of lead in water is generally below the maximum [@citeTypicalMaxLead], it is reasonable to assume that values above 100 ppb are clear outliers or simply errors in data collection. A sample of the cleaned data can be seen in @tbl-cleaned-data and a scatter plot showcasing every observation, by date of collection, can be seen in @fig-lead-samples-over-time.
 
 ```{r}
 #| label: tbl-cleaned-data
@@ -154,7 +141,6 @@ This particular data set was chosen as it is derived from the exact same source 
 ## Examining the Portion of Households Exceeding the Lead Concentration Limit
 
 We are primarily interested in whether the portion of households that exceed the lead concentration limit of 10 ppb has changed from the past portion of 13% [@citeCBC]. However, it is also important to examine whether there is a possibly significant portion of households that feature a water lead concentration that exceeds the more recent limit of 5 ppb. @tbl-percenthouseholdbylead summarizes the portion of households from the data set that fall under various ranges of lead concentrations. 
-As we are interested in uncovering whether the portion of households that exceed the lead concentration limit of 10 ppb, as well as the newer limit of 5 ppb, has changed
 
 ```{r}
 #| label: tbl-percenthouseholdbylead
@@ -172,6 +158,32 @@ cleaned_data |>
     col.names = c("Lead Concentration (ppb)", "Portion of Households")
   )
 ```  
+
+Through the use of @tbl-percenthouseholdbylead, we can see that the vast majority of water samples (98.73%) contained a lead concentration below the previous limit of 10 ppb. Even more so, approximately 97.14% of water samples are below the new limit of 5 ppb. In essence, there is clear evidence that since the previous study conducted in 2014 there has been fairly significant progress with regards to the portion of households that exceed, not only the previous limit of 10 ppb, but even the newer limit of 5 ppb, as we see that a small minority of households (2.87%) exceed the new limit, and an even smaller portion (1.28%) of households exceed the past limit of 10 ppb compared to the past portion of 13%.
+
+## Investigating the Relationship Between Time and Lead Concentration
+
+The addition of phosphate to the water cleaning process was done in 2014, however based on the analysis done thus far it is difficult to evaluate whether its impact on reducing lead concentrations was instantanesous or done over longer periods of time. A deeper understanding of this may be of use to cities or nations struggling with reducing lead exposure by water who may require solutions that can act fast. As such, 
+```{r}
+#| label: fig-meanleadbyyear
+#| fig-cap: Mean Lead Concentration (ppb) by Year of Sample Collection
+#| echo: false
+
+cleaned_data |>
+  mutate(year = lubridate::year(sample_date)) |>
+  ggplot(mapping = aes(x = year, y = lead_concentration_ppb)) +
+  stat_summary(
+    fun = "mean",
+    geom = "point",
+    color = "black",
+    size = 2
+  ) +
+  theme_classic() +
+  labs(
+    x = "Year of Sample Collection",
+    y = "Mean Lead Concentration (ppb)"
+  ) 
+```
 
 ```{r}
 #| label: fig-meanleadbypost
