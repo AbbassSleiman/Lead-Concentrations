@@ -2,7 +2,8 @@
 # Purpose: Simulates the lead concentration (in ppm) of water in 1000 houses in 
 # the Toronto area using a normal distribution with a mean of 0.05 ppm and a 
 # standard deviation of 0.02. This simulation will also delete any entries with 
-# a lead ppm below 0 as well as incorporating a postal code for each house.
+# a lead ppm below 0 as well as incorporating a postal code for each house and a 
+# date.
 # Author: Abbass Sleiman
 # Date: 18 January 2024
 # Contact: abbass.sleiman@mail.utoronto.ca
@@ -17,6 +18,13 @@ library(tibble)
 
 #### Simulate data ####
 set.seed(9)
+
+# Define the start and end date of all data points
+start_date = as.Date("2015-01-01")
+end_date = as.Date("2024-01-01")
+
+# Generate 1000 random dates within the specified range
+simulated_dates <- sample(seq(start_date, end_date, by = "1 day"), 1000, replace = TRUE)
 
 # Simulate 1000 random values from a normal distribution
 simulated_values <- rnorm(1000, mean = 0.005, sd=0.002)
@@ -39,7 +47,8 @@ simulated_data <-
       x = simulated_values,
       size = 1000,
       replace = FALSE
-  )
+  ),
+  "Sample date" = simulated_dates
 )
 
 simulated_data
@@ -64,3 +73,6 @@ num_rows == 1000
 
 # test4: Tests whether all entries in the lead concentration column are numeric
 simulated_data$"Lead concentration (ppm)" |> class() == "numeric"
+
+# test5: Tests whether the dates in the sample date column are of class date
+simulated_data$"Sample date" |> class() == "Date"

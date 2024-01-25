@@ -54,3 +54,6 @@ num_rows == 9262
 
 # test4: Tests whether all entries in the lead concentration column are numeric
 cleaned_data$lead_concentration_ppb |> class() == "numeric"
+
+# test5: Tests whether the dates in the sample date column are of class date
+cleaned_data$sample_date |> class() == "Date"
