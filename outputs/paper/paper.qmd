@@ -1,12 +1,11 @@
 ---
 title: "Testing the Waters: A Dive into Elevated Lead Levels in Toronto Homes"
-subtitle: "My subtitle if needed"
 author: 
   - Abbass Sleiman
 thanks: "Code and data used in this analysis can be found at: https://github.com/AbbassSleiman/Lead-Concentrations."
 date: today
 date-format: long
-abstract: "First sentence. Second sentence. Third sentence. Fourth sentence."
+abstract: "Lead exposure in water can cause a variety of adverse health effects including damage to the brain and slowed growth. The addition of phosphate to drinking water treatment plans in Toronto in 2014 sought to decrease the risk of lead contamination in water. Based on the analysis of water samples taken after 2014, this paper finds evidence that, over time, mean lead concentrations, and the portion of households exceeding the safe lead exposure limit, fell. Limited evidence substantiates the claim that the geographic location water samples were taken from systematically influences lead concentrations."
 format: pdf
 toc: true
 number-sections: true
@@ -23,7 +22,7 @@ bibliography: references.bib
 # Package loading
 library(tidyverse)
 library(here)
-library(tinytex) #this is where the used ones end so far.
+library(tinytex)
 library(dplyr)
 library(tibble)
 library(opendatatoronto)
@@ -37,33 +36,27 @@ options(digits = 2)
 # Read data
 raw_lead_data <- read_csv(here("inputs/data/raw_data.csv"))
 cleaned_data <- read_csv(here("outputs/data/cleaned_lead_data.csv"))
-
-# Create a data set based off the cleaned data that returns the average
-
-average_lead_by_postal_code <- cleaned_data |> 
-  group_by(postal_code) |> 
-  summarise(average_lead_by_postal_code = mean(lead_concentration_ppb))
-
-
 ```
 
 
 # Introduction
 
-Lead exposure is a serious concern for many, capable of seriously harming children's health, as well as causing a multitude of effects including damage to the brain, slowed growth, decreased IQ, and various others [@citeCDChealth]. Of the various sources of lead exposure, lead in drinking water is a relevant concern for many of us given the average person's daily reliance on tap water. Thus, given the dangers of lead exposure, in conjunction with the fact that lead cannot be seen, smelled, nor tasted, means that getting one's water tested and having knowledge of its lead concentration is incredibly useful, and possibly impactful [@citeCDCwater].
+Lead exposure is a serious concern for many, capable of seriously harming children's health, as well as causing a multitude of effects including damage to the brain, slowed growth, decreased IQ, and various others [@citeCDChealth]. Of the various sources of lead exposure, lead in drinking water is a relevant concern for any of us given the average person's daily reliance on tap water. Thus, given the dangers of lead exposure, in conjunction with the fact that lead cannot be seen, smelled, nor tasted, means that getting one's water tested and having knowledge of its lead concentration is incredibly useful, and possibly impactful [@citeCDCwater].
 
-Water produced by Toronto's drinking water treatment plans is not contaminated by lead. Instead, lead either contaminates the water through water service pipes, solder, or leaded-brass fixtures in objects like valves or faucets, depending on when the particular house was built. In 2011, the Toronto City Council approved a lead in water mitigation strategy that aimed to reduce lead in drinking water. In 2014, the city had begun to add phosphate to the drinking water treatment process which forms a protective coating in all pipes and plumbing fixtures, effectively aiding in the reduction of lead contamination in water [@citeCityToronto].
+In 2011, the Toronto City Council approved a lead in water mitigation strategy that aimed to reduce lead in drinking water. In 2014, the city had begun to add phosphate to the drinking water treatment process which forms a protective coating in all pipes and plumbing fixtures, effectively aiding in the reduction of lead contamination in water [@citeCityToronto].
 
-Lead concentration in water is typically measured in parts per billion (ppb), which is a unit of measurement describing small concentrations in water whereby 1 ppb is equivalent to 1 microgram per litre ($1 \space \mu g/L$) [@citeppb]. In May of 2014, a study had showed that 13% of Torontonian homes exceeded Health Canada's standards for lead exposure of 10 ppb (the limit at the time) after analyzing 15,000 water samples provided to the city by homeowners between 2008-2014 through the Residential Lead Testing Program [@citeCBC]. This paper utilizes data from the Residential Lead Testing Program that includes 9,302 water samples provided by households between 2015-2024 and seeks to evaluate whether the implementation of phosphate into the drinking water treatment in 2014 has made any impact on the portion of Torontonian homes with lead exposure exceeding Health Canada's past standards of 10 ppb, as well as the updated standard maximum of 5 ppb by Health Canada [@citeMaxLeadCanada]. This paper finds that...
+Lead concentration in water is typically measured in parts per billion (ppb), which is a unit of measurement describing small concentrations in water whereby 1 ppb is equivalent to 1 microgram per litre ($1 \space \mu g/L$) [@citeppb]. In May of 2014, a study had showed that 13% of Torontonian homes exceeded Health Canada's standards for lead exposure of 10 ppb (the limit at the time) after analyzing 15,000 water samples provided to the city by homeowners between 2008-2014 through the Residential Lead Testing Program [@citeCBC]. This paper utilizes data from the Residential Lead Testing Program that includes 9,302 water samples provided by households between 2015-2024 and seeks to evaluate whether the implementation of phosphate into the drinking water treatment in 2014 has made any impact on the portion of Torontonian homes with lead exposure exceeding Health Canada's past standards of 10 ppb, as well as the updated standard maximum of 5 ppb by Health Canada [@citeMaxLeadCanada]. Moreover, this paper aims to evaluate whether there are certain locations within Toronto more at-risk of having water that is contaminated with excessive levels of lead in a bid to evaluate whether the issue of lead exposure in water is more systematic or random. 
 
-The remainder of this paper is structured as follows. @sec-data....
+This paper finds evidence to suggest that the addition of phosphate to the drinking water treatment plan has decreased the concentrations of lead found in water samples over the years 2015-2024. However, it finds minimal evidence to support the notion that the geographic location that the samples were collected in have any systematic influence on the lead concentrations likely to be obtained.
+
+The remainder of this paper is structured as follows. @sec-data discusses the raw data, cleaning process, and offers a glimpse at the underlying distribution of data through tabular and graphical representations of the observations. @sec-results further elaborates on the information present in @sec-data by exploring various trends and correlations of the data as a function of the various variables at play through the use of numerous tabular and graphical representations. @sec-discussion deals with analyzing the trends and correlations showcased in @sec-results in more detail, comparing the results found to those in the literature cited. Finally @sec-limitsnextsteps discusses the limitations of the analysis conducted, as well as the next steps that could be taken to improve the overall reliability of the paper.
 
 
 # Data {#sec-data}
 
 ## Raw Data 
 
-The data used in this paper is derived from Open Data Toronto and is read into this paper through the opendatatoronto library [@citeOpenDataToronto]. The particular data set used to analyze the lead concentrations in water samples in Torontonian homes is Non Regulated Lead Sample [@citeLeadData]. All the data analysis was done through R [@citeR] with the aid of the following packages: tidyverse [@citetidyverse], here [@citehere], dplyr [@citedplyr], tibble [@citetibble], janitor [@citejanitor], ggplot2 [@citeggplot2], and knitr [@citeknitr]. (maybe readr?)
+The data used in this paper is derived from Open Data Toronto and is read into this paper through the opendatatoronto library [@citeOpenDataToronto]. The particular data set used to analyze the lead concentrations in water samples in Torontonian homes is Non Regulated Lead Sample [@citeLeadData]. All the data analysis was done through R [@citeR] with the aid of the following packages: tidyverse [@citetidyverse], here [@citehere], dplyr [@citedplyr], tibble [@citetibble], janitor [@citejanitor], ggplot2 [@citeggplot2], and knitr [@citeknitr].
 
 The data used is published by Toronto Water and features data from Toronto's Residential Lead Testing Program, providing information on various houses' lead concentrations based on water samples that the households themselves provide. The data is refreshed daily and the particular data used in this paper is up-to-date as of January 22, 2024. The raw data set features the lead concentration in parts per million (ppm) of 12,810 water samples where 1 ppm is equivalent to 1000 ppb or 1 milligram per litre ($1 \space mg/L$). The data set also includes the date that each sample was collected, as well as the partial postal code (only the first three digits of the resident's postal code for privacy reasons).
 
@@ -73,7 +66,7 @@ Some of the data points had missing attributes whereby a "NA" was put in place o
 
 ```{r}
 #| label: tbl-cleaned-data
-#| tbl-cap: Sample of Cleaned Lead Data 
+#| tbl-cap: Sample of cleaned lead data 
 #| echo: false
 
 head(cleaned_data, 6) |>
@@ -103,13 +96,13 @@ cleaned_data |>
   scale_x_date(date_labels = "%Y", date_breaks = "1 year")
 ```
 
-## Basic Summary of Data
+## Basic Summary Statistics of the Data
 
 Though @fig-lead-samples-over-time provided some insight into the attributes of the data, namely that the vast majority of the water samples lie below the previous lead concentration limit of 10 ppb, and that there is a clear gap in data in the year 2020, more information is required to get a better grasp of the full picture. To gain a clearer insight into the intricacies of the data, it is important to first make note of the number of observations in each year data was collected in (2015-2024). This information is laid out in @tbl-numobsbyyear, enabling us to see that we have access to much fewer data points in the year 2020 (likely as a result of the COVID-19 pandemic), as well as illuminating the fact that there is but a single observation in the year 2024. Another important aspect to discuss is the overall mean and standard deviation of lead concentrations (ppb) that the entire data set yields. As showcased in @tbl-meansdlead, we can clearly see that, on average, households tend to have lead concentrations well below the maximum limit (approximately 1.04 ppb compared to the limit of 5 ppb). However, taking into account the fairly large standard deviation of approximately 4.05 ppb, we cannot make any reasonable conclusions as of yet. A deeper analysis will follow in @sec-results.
 
 ```{r}
 #| label: tbl-numobsbyyear
-#| tbl-cap: Number of Observations by Year
+#| tbl-cap: Number of observations by year
 #| echo: false
 
 cleaned_data |>
@@ -120,7 +113,7 @@ cleaned_data |>
 
 ```{r}
 #| label: tbl-meansdlead
-#| tbl-cap: Mean and Standard Deviation of Aggregate Lead Concentrations (ppb)
+#| tbl-cap: Mean and standard deviation of all observed lead concentrations (ppb)
 #| echo: false
 
 cleaned_data |>
@@ -144,7 +137,7 @@ We are primarily interested in whether the portion of households that exceed the
 
 ```{r}
 #| label: tbl-percenthouseholdbylead
-#| tbl-cap: Portion of Households that Fall Under (Fix Name)
+#| tbl-cap: Distribution of households across lead concentration categories 
 #| echo: false
 
 cleaned_data |>
@@ -159,16 +152,16 @@ cleaned_data |>
   )
 ```  
 
-Through the use of @tbl-percenthouseholdbylead, we can see that the vast majority of water samples (98.73%) contained a lead concentration below the previous limit of 10 ppb. Even more so, approximately 97.14% of water samples are below the new limit of 5 ppb. In essence, there is clear evidence that since the previous study conducted in 2014 there has been fairly significant progress with regards to the portion of households that exceed, not only the previous limit of 10 ppb, but even the newer limit of 5 ppb, as we see that a small minority of households (2.87%) exceed the new limit, and an even smaller portion (1.28%) of households exceed the past limit of 10 ppb compared to the past portion of 13%.
+Through the use of @tbl-percenthouseholdbylead, we can see that the vast majority of water samples (98.73%) contained a lead concentration below the previous limit of 10 ppb. Even more so, approximately 97.14% of water samples are below the new limit of 5 ppb.
 
 ## Investigating the Relationship Between Time and Lead Concentration
 
-The addition of phosphate to the water cleaning process was done in 2014, however based on the analysis done thus far it is difficult to evaluate whether its impact on reducing lead concentrations was instantanesous or done over longer periods of time. A deeper understanding of this may be of use to cities or nations struggling with reducing lead exposure by water who may require solutions that can act fast. As such, one metric we can use to see the effect of the phosphate addition over time is to simply compare the means of water samples collected in a particular period of time and compare it to subsequent periods. In our particular case, we can employ @fig-meanleadbyyear to see the change in the mean lead concentrations of water samples across various years from 2015 to 2024.
+To further our understanding of the data, we can employ @fig-meanleadbyyear to see the change in the mean lead concentrations of water samples across various years from 2015 to 2024.
 
 
 ```{r}
 #| label: fig-meanleadbyyear
-#| fig-cap: Mean Lead Concentration (ppb) by Year of Sample Collection
+#| fig-cap: Mean lead concentration (ppb) by year of sample collection
 #| echo: false
 
 mean_by_year <- cleaned_data |>
@@ -191,11 +184,11 @@ mean_by_year |>
   )
 ```
 
-@fig-meanleadbyyear offers some evidence that the improvement in lead concentrations could have been gradual as a negative correlation between mean lead concentration and time is visible. It is important to note, however, that the data point for the year 2024 is not entirely trustworthy given that it is based off only one observation. Using just the mean as a metric is not enough to conclude whether the improvement was gradual, however, as the portion of households exceeding the lead concentration limit could have either remained constant or even possibly increased over time. Thus, in an attempt to confront this issue, we can compare the portion of households that exceed a lead concentration of 10 ppb, as well as the portion of households that exceed a lead concentration of 5 ppb, over time using @fig-percenthouselead10 and @fig-percenthouselead5 respectively. Do note that as a result of having only one observation for the year 2024, it is omitted from both graphs as examining the portion of observations that fall under any category in that year will yield either 100% or 0%, and as such, does not aid in our discussion.
+Through the use of @fig-meanleadbyyear, we can see that year with greatest average lead concentration was 2015 - with a lead concentration of 1.53 ppb - whereas the lowest concentration was found in 2024 - with a lead concentration of 0.15 ppb. It is important to note, however, that the data point for the year 2024 is not entirely trustworthy given that it is based off only one observation. We gain a deeper insight into this data using @fig-percenthouselead10 and @fig-percenthouselead5 respectively, which showcase the proportion of water samples taken in each year with a lead concentration exceeding 10 ppb and 5 ppb respectively. Do note that as a result of having only one observation for the year 2024, it is omitted from both graphs as examining the portion of observations that fall under any category in that year will yield either 100% or 0%, and as such, does not aid in our discussion.
 
 ```{r}
 #| label: fig-percenthouselead10
-#| fig-cap: "Portion of Households Exceeding a Lead Concentration of 10 ppb by Year"
+#| fig-cap: Portion of households exceeding a lead concentration of 10 ppb by year
 #| echo: false
 #| message: false
 
@@ -221,7 +214,7 @@ cleaned_data |>
 
 ```{r}
 #| label: fig-percenthouselead5
-#| fig-cap: "Portion of Households Exceeding a Lead Concentration of 5 ppb by Year"
+#| fig-cap: Portion of households exceeding a lead concentration of 5 ppb by year
 #| echo: false
 #| message: false
 
@@ -249,11 +242,11 @@ Though both figures appear to showcase a slight rise between 2019-2022, we can s
 
 ## Exploring the Relationship Between Location and Lead Concentration
 
-We can further expand our discussion by observing potential trends in lead concentration by location by evaluating the mean lead concentration in each (partial) postal code. However, due to the sheer number of varying postal codes available in the data set, @fig-meanleadbypost simplifies the information slightly by grouping all entries from the same general geographic location by merging values from postal codes with the same first two characters. Though we may lose some underlying information about the lead concentrations in each individual partial postal code, by grouping entries together in this way we end up with a larger number of data points for each observation. Thus, it is more likely that the means that we calculate will better reflect the means of the populations of interest relative to the means we would calculate for each individual partial postal code as some partial postal codes in the data feature a minimal number of observations compared to others.
+We can further expand our discussion by observing potential trends in lead concentration by location by evaluating the mean lead concentration in grouped (partial) postal codes, whereby all entries from the same general geographic location, in our case defined as having the same first two characters in the partial postal code, were grouped together. This information is laid out in @fig-meanleadbypost which shows us that samples taken in regions with a postal code beginning with "M8-" features the lowest average lead concentration of 0.29 ppb, and that samples taken in regions with a postal code beginning with "M6-" feature the highest average lead concentration of 1.27 ppb.
 
 ```{r}
 #| label: fig-meanleadbypost
-#| fig-cap: Mean Lead Concentration (ppb) by Partial Postal Code
+#| fig-cap: Mean lead concentration (ppb) by grouped partial postal code
 #| echo: false
 
 average_lead_by_postal_code <- cleaned_data |>
@@ -270,52 +263,25 @@ average_lead_by_postal_code |>
   )
 ```
 
-```{r}
-#| label: tbl-meanleadbypost
-#| tbl-cap: Sample of Mean Lead Concentration (ppb) by Partial Postal Code
-#| echo: false
+# Discussion {#sec-discussion}
 
-cleaned_data |>
-  group_by(postal_code) |>
-  summarize(
-    mean_lead_concentration_ppb = mean(lead_concentration_ppb),
-    sd_lead_concentration_ppb = sd(lead_concentration_ppb)
-  ) |>
-  head(6) |>
-  kable(
-    col.names = c("Partial Postal Code", "Mean Lead Concentration (ppb)", "SD of Lead Concentration (ppb)"),
-    booktabs = TRUE
-    )
-```
+Based on the information laid out in @sec-results, in particular through @tbl-percenthouseholdbylead, we first find evidence that, since the previous study conducted in 2014, there has been fairly significant progress with regards to the portion of households that exceed, not only the previous limit of 10 ppb, but even the newer limit of 5 ppb, as we see that a small minority of households (2.87%) exceed the new limit, and an even smaller portion (1.28%) of households exceed the past limit of 10 ppb compared to the past portion of 13%. As a result, this paper finds evidence that the addition of phosphate to the drinking water treatment process has made notable changes with respect to the concentration of lead found in water.
 
+Since the addition of phosphate to the water cleaning process was done in 2014, this paper sought to evaluate whether its impact on reducing lead concentrations was instantaneous or done over longer periods of time. A deeper understanding of this may be of use to cities or nations struggling with reducing lead exposure by water who may require solutions that can act fast. As such, one metric we can use to see the effect of the phosphate addition over time is to simply compare the means of water samples collected in a particular period of time and compare it to subsequent periods as was done in @fig-meanleadbyyear.
 
-# Discussion
+@fig-meanleadbyyear offers some evidence that the improvement in lead concentrations could have been gradual as a negative correlation between mean lead concentration and time is visible. However, as using just the mean as a metric is not enough to conclude whether the improvement was gradual, since the portion of households exceeding the lead concentration limit could have either remained constant or even possibly increased over time, in an attempt to confront this issue, we can employ both @fig-percenthouselead10 and @fig-percenthouselead5 to compare the portion of households that exceed a lead concentration of 10 ppb, as well as the portion of households that exceed a lead concentration of 5 ppb, over time. Both showcased a generally consistent downward trend, in line with the information presented by @fig-meanleadbyyear, indicating that not only did the overall average of lead concentrations fall over time, but as did the proportion of households with water that was dangerously contaminated with lead, providing further evidence that the addition of phosphate has led to overall improvements both in the short-term and long-term.
 
-## First discussion point {#sec-first-point}
+We gain a deeper insight into the reasoning behind why some of the samples had the lead concentrations that they did by evaluating whether the geographic location a sample was taken in may have been systematically affecting whether the lead concentration turns out lower or higher. To explore whether some regions had access to poorer quality water, we can employ @fig-meanleadbypost which allowed us to see that there is a clear variation in average lead concentrations based only on location. However, though variation does exist, all lead concentration averages by geographic location are well below the 5 ppb limit, thus though some variance is present it is not enough to conclude that some areas have systematically worse quality water as the differences are negligible given the fact that the range of values are within 1 ppb of one another. Though a potentially more insightful analysis by location could have been done without the grouping of postal codes, which eliminated some of the information present in the datam it is important to clarify that due to the sheer number of varying postal codes available in the data set, grouping was necessary to provide digestible information. Moreover, by grouping entries together in this way we end up with a larger number of data points for each observation, making it more likely that the means that we calculate will better reflect the means of the populations of interest relative to the means we would calculate for each individual partial postal code as some partial postal codes in the data feature a minimal number of observations compared to others.
 
-## Second discussion point
+Overall, there is evidence that the addition of phosphate to the drinking water treatment process has decreased the proportion of households that exceed Health Canada's past lead concentration limit of 10 ppb, as the proportion of households that feature a lead concentration that exceeds both 10 ppb, as well as 5 ppb, is well below the past proportion of 13%. Moreover, this paper did not find any substantial evidence that the geographic location of the households plays any major part in determining the quality of water available as there was a negligible difference in the mean lead concentrations between the geographic group with lowest concentration, and that of the highest concentration.
 
-## Third discussion point
+# Limitations and Next Steps {#sec-limitsnextsteps}
 
-## Weaknesses and next steps
+There are a few limitations to address with regards to the analysis conducted and subsequent conclusions drawn. This paper's primary focus was on the comparative analysis between the proportion of households featuring water exceeding Health Canada's limit in the past (2014 and prior) and the subsequent years following the addition of phosphate to the drinking water treatment plan (2015-2024). The value of 13% for the proportion of households that exceeded Health Canada's past lead concentration limit of 10 ppb taken from the literature, however, made no explicit mention of whether the analysis was conducted on cleaned data, free of outliers, or whether it took the data as is. Thus, as this paper conducted the analysis based on data that was rid of outliers, under the possible circumstance that the literature cited did not remove any entries as was done in this analysis, many of the conclusions drawn could be void of any reliability as it may have been better suited to retain the values deemed to be outliers in a bid to avoid a downward bias in the lead concentrations considered.
 
+Moreover, given that the City of Toronto has has no control over how or where a water sample is obtained by the individual, the reliability of the data set is entirely reliant on the individual residents who collect their own tap water samples, and as such, there is no guarantee that the water samples collected were done so in the appropriate manner [@citeCityToronto]. As a result, it is entirely possible that many observations kept in the cleaned data set were largely inaccurate, rendering much of the analysis unreliable or somewhat defective in nature.
 
-\newpage
-
-\appendix
-
-# Appendix {-}
-
-
-# Additional data details
-
-
-
-## Diagnostics
-
-
-
-
+Future analysis could be better improved by incorporating sources of data pertaining to lead concentrations in water samples taken across Toronto which are better controlled and are collected by individuals who are more qualified to do so. Moreover, making use of time-series data that showcases the change in lead concentrations over time from the same source could provide a deeper, and possibly more accurate, insight into the changes that various water treatments may have on the quality of water with regards to its concentration of lead.
 
 \newpage
 
