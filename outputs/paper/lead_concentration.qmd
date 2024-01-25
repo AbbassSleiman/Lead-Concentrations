@@ -5,7 +5,7 @@ author:
 thanks: "Code and data used in this analysis can be found at: https://github.com/AbbassSleiman/Lead-Concentrations."
 date: today
 date-format: long
-abstract: "Lead exposure in water can cause a variety of adverse health effects including damage to the brain and slowed growth. The addition of phosphate to drinking water treatment plans in Toronto in 2014 sought to decrease the risk of lead contamination in water. Based on the analysis of water samples taken after 2014, this paper finds evidence that, over time, mean lead concentrations, and the portion of households exceeding the safe lead exposure limit, fell. Limited evidence substantiates the claim that the geographic location water samples were taken from systematically influences lead concentrations."
+abstract: "Consumption of water exposed to lead can cause a variety of adverse health effects including damage to the brain and slowed growth. The addition of phosphate to drinking water treatment plans in Toronto in 2014 sought to decrease the risk of lead contamination in water. Based on the analysis of water samples taken after 2014, this paper finds evidence that, over time, mean lead concentrations, and the portion of households exceeding the safe lead exposure limit, fell. Limited evidence substantiates the claim that the geographic location water samples were taken from systematically influences lead concentrations."
 format: pdf
 toc: true
 number-sections: true
