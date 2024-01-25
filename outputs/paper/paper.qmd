@@ -117,8 +117,10 @@ cleaned_data |>
 #| echo: false
 
 cleaned_data |>
-  summarize(mean_lead_concentration_ppb = mean(lead_concentration_ppb),
-    sd_lead_concentration_ppb = sd(lead_concentration_ppb)) |>
+  summarize(
+    mean_lead_concentration_ppb = sprintf("%.2f", mean(lead_concentration_ppb)),
+    sd_lead_concentration_ppb = sprintf("%.2f", sd(lead_concentration_ppb))
+    ) |>
   kable(
     col.names = c("Mean Lead Concentration (ppb)", "SD of Lead Concentration (ppb)")
     )
