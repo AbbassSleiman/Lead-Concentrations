@@ -163,27 +163,93 @@ Through the use of @tbl-percenthouseholdbylead, we can see that the vast majorit
 
 ## Investigating the Relationship Between Time and Lead Concentration
 
-The addition of phosphate to the water cleaning process was done in 2014, however based on the analysis done thus far it is difficult to evaluate whether its impact on reducing lead concentrations was instantanesous or done over longer periods of time. A deeper understanding of this may be of use to cities or nations struggling with reducing lead exposure by water who may require solutions that can act fast. As such, 
+The addition of phosphate to the water cleaning process was done in 2014, however based on the analysis done thus far it is difficult to evaluate whether its impact on reducing lead concentrations was instantanesous or done over longer periods of time. A deeper understanding of this may be of use to cities or nations struggling with reducing lead exposure by water who may require solutions that can act fast. As such, one metric we can use to see the effect of the phosphate addition over time is to simply compare the means of water samples collected in a particular period of time and compare it to subsequent periods. In our particular case, we can employ @fig-meanleadbyyear to see the change in the mean lead concentrations of water samples across various years from 2015 to 2024.
+
+
 ```{r}
 #| label: fig-meanleadbyyear
 #| fig-cap: Mean Lead Concentration (ppb) by Year of Sample Collection
 #| echo: false
 
-cleaned_data |>
-  mutate(year = lubridate::year(sample_date)) |>
-  ggplot(mapping = aes(x = year, y = lead_concentration_ppb)) +
-  stat_summary(
-    fun = "mean",
-    geom = "point",
-    color = "black",
-    size = 2
-  ) +
+mean_by_year <- cleaned_data |>
+  group_by(year = year(sample_date)) |>
+  summarize(mean_lead_concentration_ppb = mean(lead_concentration_ppb))
+
+mean_by_year$year <- factor(mean_by_year$year, levels = c(2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024))
+
+mean_by_year |>
+  ggplot(aes(x = year, y = mean_lead_concentration_ppb)) +
+  geom_point() +
   theme_classic() +
   labs(
     x = "Year of Sample Collection",
     y = "Mean Lead Concentration (ppb)"
-  ) 
+  ) +
+  scale_y_continuous(
+    limits = c(0, 1.6),
+    breaks = seq(0, 1.6, by = 0.2)
+  )
 ```
+
+@fig-meanleadbyyear offers some evidence that the improvement in lead concentrations could have been gradual as a negative correlation between mean lead concentration and time is visible. It is important to note, however, that the data point for the year 2024 is not entirely trustworthy given that it is based off only one observation. Using just the mean as a metric is not enough to conclude whether the improvement was gradual, however, as the portion of households exceeding the lead concentration limit could have either remained constant or even possibly increased over time. Thus, in an attempt to confront this issue, we can compare the portion of households that exceed a lead concentration of 10 ppb, as well as the portion of households that exceed a lead concentration of 5 ppb, over time using @fig-percenthouselead10 and @fig-percenthouselead5 respectively. Do note that as a result of having only one observation for the year 2024, it is omitted from both graphs as examining the portion of observations that fall under any category in that year will yield either 100% or 0%, and as such, does not aid in our discussion.
+
+```{r}
+#| label: fig-percenthouselead10
+#| fig-cap: "Portion of Households Exceeding a Lead Concentration of 10 ppb by Year"
+#| echo: false
+#| message: false
+
+cleaned_data |>
+  mutate(lead_group = case_when(
+    lead_concentration_ppb > 10 ~ ">10 ppb",
+    lead_concentration_ppb <= 10 ~ "<=10 ppb"
+  )) |>
+  group_by(year = lubridate::year(sample_date), lead_group) |>
+  summarise(count = n()) |>
+  group_by(year) |>
+  mutate(prop = count / sum(count)) |>
+  filter(lead_group != "<=10 ppb") |>
+  ggplot(aes(x = factor(year), y = prop)) +
+  geom_bar(stat = "identity", position = "stack", fill = "lightblue") +
+  theme_classic() +
+  labs(
+    x = "Year of Sample Collection",
+    y = "Portion of Houses Exceeding a Lead Concentration of 10 ppb"
+  ) +
+  theme(axis.title.y = element_text(size = 8))
+```
+
+```{r}
+#| label: fig-percenthouselead5
+#| fig-cap: "Portion of Households Exceeding a Lead Concentration of 5 ppb by Year"
+#| echo: false
+#| message: false
+
+cleaned_data |>
+  mutate(lead_group = case_when(
+    lead_concentration_ppb > 5 ~ ">5 ppb",
+    lead_concentration_ppb <= 5 ~ "<=5 ppb"
+  )) |>
+  group_by(year = lubridate::year(sample_date), lead_group) |>
+  summarise(count = n()) |>
+  group_by(year) |>
+  mutate(prop = count / sum(count)) |>
+  filter(lead_group != "<=5 ppb") |>
+  ggplot(aes(x = factor(year), y = prop)) +
+  geom_bar(stat = "identity", position = "stack", fill = "pink") +
+  theme_classic() +
+  labs(
+    x = "Year of Sample Collection",
+    y = "Portion of Houses Exceeding a Lead Concentration of 5 ppb"
+    ) +
+  theme(axis.title.y = element_text(size = 8))
+```
+
+Though both figures appear to showcase a slight rise between 2019-2022, we can see an overall fairly consistent decline over time in the portion of households that exceed a lead concentration of 10 ppb as well as 5 ppb. The year with the greatest portion of households exceeding a lead concentration of 10 ppb is 2015, which also happens to be the year with the greatest portion of houses exceeding a concentration of 5 ppb. Similarly, 2020 features the lowest portion of households exceeding a lead concentration of 5 ppb as well as 10 ppb.
+
+## Exploring the Relationship Between Location and Lead Concentration
+
+We can further expand our discussion by observing potential trends in lead concentration by location by evaluating the mean lead concentration in each (partial) postal code. However, due to the sheer number of varying postal codes available in the data set, @fig-meanleadbypost simplifies the information slightly by grouping all entries from the same general geographic location by merging values from postal codes with the same first two characters. Though we may lose some underlying information about the lead concentrations in each individual partial postal code, by grouping entries together in this way we end up with a larger number of data points for each observation. Thus, it is more likely that the means that we calculate will better reflect the means of the populations of interest relative to the means we would calculate for each individual partial postal code as some partial postal codes in the data feature a minimal number of observations compared to others.
 
 ```{r}
 #| label: fig-meanleadbypost
@@ -191,10 +257,17 @@ cleaned_data |>
 #| echo: false
 
 average_lead_by_postal_code <- cleaned_data |>
-  group_by(postal_code) |>
-  summarize(mean_lead_concentration_ppb = mean(lead_concentration_ppb))
+  group_by(grouped_postal_code = str_sub(postal_code, 1, 2) |> paste0("-")) |>
+  summarise(mean_lead_concentration_ppb = mean(lead_concentration_ppb))
 
-
+average_lead_by_postal_code |>
+  ggplot(aes(x = grouped_postal_code, y = mean_lead_concentration_ppb)) +
+  geom_bar(stat = "identity", position = "stack", fill = "lightblue") +
+  theme_classic() +
+  labs(
+    x = "Grouped Partial Postal Code",
+    y = "Mean Lead Concentration (ppb)"
+  )
 ```
 
 ```{r}
