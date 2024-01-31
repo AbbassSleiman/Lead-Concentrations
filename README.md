@@ -2,7 +2,7 @@
 
 ## Overview
 
-This paper analyzes the lead concentrations in water of Torontonian households over time. In particular, it explores the changes in lead concentrations between 2015-2024.
+This paper analyzes the lead concentrations in water of Torontonian households over time, focused on 2015-2024.
 
 ## File Structure
 
